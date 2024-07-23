@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.sportradar.exceptions.MatchConflictException;
 import org.sportradar.exceptions.MatchNotFoundException;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ScoreboardServiceTest {
@@ -95,5 +97,26 @@ class ScoreboardServiceTest {
     @Test
     void finishMatch_matchNotFound_throwsException() {
         assertThrows(MatchNotFoundException.class, () -> service.finishMatch(TEAM_A, TEAM_B));
+    }
+
+    @Test
+    void getSummary_sortedByScoreAndStartTime() {
+        service.startMatch("Mexico", "Canada");
+        service.startMatch("Spain", "Brazil");
+        service.startMatch("Germany", "France");
+        service.startMatch("Uruguay", "Italy");
+        service.startMatch("Argentina", "Australia");
+
+        service.updateScore("Mexico", "Canada",0,5);
+        service.updateScore("Spain", "Brazil",10,2);
+        service.updateScore("Germany", "France",2,2);
+        service.updateScore("Uruguay", "Italy",6,6);
+        service.updateScore("Argentina", "Australia",3,1);
+        List<String> summary = service.getSummary();
+        assertEquals("Uruguay 6 - Italy 6", summary.get(0));
+        assertEquals("Spain 10 - Brazil 2", summary.get(1));
+        assertEquals("Mexico 0 - Canada 5", summary.get(2));
+        assertEquals("Argentina 3 - Australia 1", summary.get(3));
+        assertEquals("Germany 2 - France 2", summary.get(4));
     }
 }

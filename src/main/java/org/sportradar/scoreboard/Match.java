@@ -2,13 +2,11 @@ package org.sportradar.scoreboard;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.Objects;
 
 @Getter
 @Setter
-@ToString
 public class Match {
     private final String homeTeam;
     private final String awayTeam;
@@ -22,6 +20,15 @@ public class Match {
         this.homeScore = 0;
         this.awayScore = 0;
         this.startTime = System.currentTimeMillis();
+    }
+
+    public int getTotalScore() {
+        return homeScore + awayScore;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %d - %s %d", homeTeam, homeScore, awayTeam, awayScore);
     }
 
     @Override

@@ -5,10 +5,7 @@ import org.sportradar.exceptions.MatchConflictException;
 import org.sportradar.exceptions.MatchNotFoundException;
 import org.sportradar.utils.ScoreboardUtils;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 public class ScoreboardService {
@@ -37,7 +34,15 @@ public class ScoreboardService {
     }
 
     public List<String> getSummary() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var sortedMatches = activeMatches.stream()
+                .sorted(Comparator.comparingInt(Match::getTotalScore)
+                        .thenComparingLong(Match::getStartTime)
+                        .reversed()
+                )
+                .toList();
+        return sortedMatches.stream()
+                .map(Match::toString)
+                .toList();
     }
 
     private Match findMatch(String homeTeam, String awayTeam) {
