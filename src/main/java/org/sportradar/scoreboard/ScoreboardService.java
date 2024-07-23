@@ -1,7 +1,10 @@
 package org.sportradar.scoreboard;
 
 import lombok.Getter;
+import org.sportradar.exceptions.MatchConflictException;
+import org.sportradar.utils.ScoreboardUtils;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +14,9 @@ public class ScoreboardService {
     private final Set<Match> activeMatches = new HashSet<>();
 
     public void startMatch(String homeTeam, String awayTeam) {
+        ScoreboardUtils.validateTeamNames(homeTeam, awayTeam);
+        ensureMatchDoesNotExist(homeTeam, awayTeam);
+
         activeMatches.add(new Match(homeTeam, awayTeam));
     }
 
@@ -24,5 +30,19 @@ public class ScoreboardService {
 
     public List<String> getSummary() {
         throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    private void ensureMatchDoesNotExist(String homeTeam, String awayTeam) {
+        if (isTeamInMatch(homeTeam)){
+            throw new MatchConflictException(homeTeam);
+        }
+        if (isTeamInMatch(awayTeam)){
+            throw new MatchConflictException(awayTeam);
+        }
+    }
+
+    private boolean isTeamInMatch(String team) {
+        return activeMatches.stream()
+                .anyMatch(match -> match.getHomeTeam().equals(team) || match.getAwayTeam().equals(team));
     }
 }
