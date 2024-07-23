@@ -30,7 +30,8 @@ public class ScoreboardService {
     }
 
     public void finishMatch(String homeTeam, String awayTeam) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Match match = findMatch(homeTeam, awayTeam);
+        activeMatches.remove(match);
     }
 
     public List<String> getSummary() {
@@ -45,10 +46,10 @@ public class ScoreboardService {
     }
 
     private void ensureMatchDoesNotExist(String homeTeam, String awayTeam) {
-        if (isTeamInMatch(homeTeam)){
+        if (isTeamInMatch(homeTeam)) {
             throw new MatchConflictException(homeTeam);
         }
-        if (isTeamInMatch(awayTeam)){
+        if (isTeamInMatch(awayTeam)) {
             throw new MatchConflictException(awayTeam);
         }
     }

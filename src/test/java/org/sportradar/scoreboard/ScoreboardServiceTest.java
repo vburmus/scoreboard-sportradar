@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.sportradar.exceptions.MatchConflictException;
 import org.sportradar.exceptions.MatchNotFoundException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ScoreboardServiceTest {
     public static final String TEAM_A = "Team A";
@@ -79,5 +78,22 @@ class ScoreboardServiceTest {
         //then
         assertThrows(IllegalArgumentException.class,
                 () -> service.updateScore(TEAM_A, TEAM_C, 0, -8));
+    }
+
+    @Test
+    void finishMatch_matchExists_success() {
+        //given
+        service.startMatch(TEAM_A, TEAM_B);
+        int sizeBeforeFinish = service.getActiveMatches().size();
+        //when
+        service.finishMatch(TEAM_A, TEAM_B);
+        //then
+        assertEquals(1, sizeBeforeFinish);
+        assertEquals(0, service.getActiveMatches().size());
+    }
+
+    @Test
+    void finishMatch_matchNotFound_throwsException() {
+        assertThrows(MatchNotFoundException.class, () -> service.finishMatch(TEAM_A, TEAM_B));
     }
 }
