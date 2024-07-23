@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ScoreboardServiceTest {
     public static final String TEAM_A = "Team A";
     public static final String TEAM_B = "Team B";
-    public static final String TEAM_C = "Team B";
+    public static final String TEAM_C = "Team C";
     private ScoreboardService service;
 
     @BeforeEach
@@ -54,7 +54,7 @@ class ScoreboardServiceTest {
     }
 
     @Test
-    void updateScore_existingTeams_success() {
+    void updateScore_existingTeamsAndValidScores_success() {
         //given
         service.startMatch(TEAM_A, TEAM_B);
         //when
@@ -67,12 +67,17 @@ class ScoreboardServiceTest {
     }
 
     @Test
-    void updateScore_missingTeam_throwException() {
+    void updateScore_matchNotFound_throwException() {
+        assertThrows(MatchNotFoundException.class,
+                () -> service.updateScore(TEAM_A, TEAM_B, 1, 2));
+    }
+
+    @Test
+    void updateScore_invalidScores_throwException() {
         //when
         service.startMatch(TEAM_A, TEAM_C);
         //then
-        assertThrows(MatchNotFoundException.class,
-                () -> service.updateScore(TEAM_B, TEAM_A, 1, 2));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.updateScore(TEAM_A, TEAM_C, 0, -8));
     }
-
 }

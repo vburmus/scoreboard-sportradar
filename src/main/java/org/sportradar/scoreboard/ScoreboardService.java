@@ -22,6 +22,8 @@ public class ScoreboardService {
     }
 
     public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
+        ScoreboardUtils.validateScores(homeScore, awayScore);
+
         Match match = findMatch(homeTeam, awayTeam);
         match.setHomeScore(homeScore);
         match.setAwayScore(awayScore);
