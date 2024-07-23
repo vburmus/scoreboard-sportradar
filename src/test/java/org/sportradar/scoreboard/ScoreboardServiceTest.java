@@ -3,6 +3,7 @@ package org.sportradar.scoreboard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.sportradar.exceptions.MatchConflictException;
+import org.sportradar.exceptions.MatchNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ScoreboardServiceTest {
     public static final String TEAM_A = "Team A";
     public static final String TEAM_B = "Team B";
+    public static final String TEAM_C = "Team B";
     private ScoreboardService service;
 
     @BeforeEach
@@ -43,12 +45,34 @@ class ScoreboardServiceTest {
     @Test
     void startMatch_existingMatch_throwsException() {
         //given
-        String anotherAwayTeam = "Team C";
         service.startMatch(TEAM_A, TEAM_B);
         //when
         var repeatingTeamException = assertThrows(MatchConflictException.class,
-                () -> service.startMatch(TEAM_A, anotherAwayTeam));
+                () -> service.startMatch(TEAM_A, TEAM_C));
         //then
         assertEquals(MatchConflictException.MATCH_CONFLICT_MESSAGE.formatted(TEAM_A), repeatingTeamException.getMessage());
     }
+
+    @Test
+    void updateScore_existingTeams_success() {
+        //given
+        service.startMatch(TEAM_A, TEAM_B);
+        //when
+        service.updateScore(TEAM_A, TEAM_B, 1, 2);
+        //then
+        var expectedMatch = new Match(TEAM_A, TEAM_B);
+        expectedMatch.setHomeScore(1);
+        expectedMatch.setAwayScore(2);
+        assertEquals(expectedMatch, service.getActiveMatches().toArray()[0]);
+    }
+
+    @Test
+    void updateScore_missingTeam_throwException() {
+        //when
+        service.startMatch(TEAM_A, TEAM_C);
+        //then
+        assertThrows(MatchNotFoundException.class,
+                () -> service.updateScore(TEAM_B, TEAM_A, 1, 2));
+    }
+
 }

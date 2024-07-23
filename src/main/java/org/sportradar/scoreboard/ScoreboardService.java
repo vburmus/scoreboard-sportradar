@@ -2,6 +2,7 @@ package org.sportradar.scoreboard;
 
 import lombok.Getter;
 import org.sportradar.exceptions.MatchConflictException;
+import org.sportradar.exceptions.MatchNotFoundException;
 import org.sportradar.utils.ScoreboardUtils;
 
 import java.util.Collections;
@@ -21,7 +22,9 @@ public class ScoreboardService {
     }
 
     public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Match match = findMatch(homeTeam, awayTeam);
+        match.setHomeScore(homeScore);
+        match.setAwayScore(awayScore);
     }
 
     public void finishMatch(String homeTeam, String awayTeam) {
@@ -30,6 +33,13 @@ public class ScoreboardService {
 
     public List<String> getSummary() {
         throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    private Match findMatch(String homeTeam, String awayTeam) {
+        return activeMatches.stream()
+                .filter(match -> match.getHomeTeam().equals(homeTeam) && match.getAwayTeam().equals(awayTeam))
+                .findFirst()
+                .orElseThrow(() -> new MatchNotFoundException(homeTeam, awayTeam));
     }
 
     private void ensureMatchDoesNotExist(String homeTeam, String awayTeam) {
