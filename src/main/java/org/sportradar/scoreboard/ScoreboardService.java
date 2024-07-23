@@ -16,6 +16,8 @@ public class ScoreboardService {
 
     public void startMatch(String homeTeam, String awayTeam) {
         ScoreboardUtils.validateTeamNames(homeTeam, awayTeam);
+        homeTeam = homeTeam.trim();
+        awayTeam = awayTeam.trim();
         ensureMatchDoesNotExist(homeTeam, awayTeam);
 
         activeMatches.add(new Match(homeTeam, awayTeam));

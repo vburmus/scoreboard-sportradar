@@ -42,12 +42,12 @@ class ScoreboardServiceTest {
     }
 
     @Test
-    void startMatch_existingMatch_throwsException() {
+    void startMatch_existingMatchWithWhitespaces_throwsException() {
         //given
         service.startMatch(TEAM_A, TEAM_B);
         //when
         var repeatingTeamException = assertThrows(MatchConflictException.class,
-                () -> service.startMatch(TEAM_A, TEAM_C));
+                () -> service.startMatch(" " + TEAM_A + " ", TEAM_C));
         //then
         assertEquals(MatchConflictException.MATCH_CONFLICT_MESSAGE.formatted(TEAM_A), repeatingTeamException.getMessage());
     }
