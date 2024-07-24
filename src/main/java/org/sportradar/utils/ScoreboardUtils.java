@@ -1,7 +1,10 @@
 package org.sportradar.utils;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.Arrays;
 
+@UtilityClass
 public class ScoreboardUtils {
     public static void validateTeamNames(String homeTeam, String awayTeam) {
         if (homeTeam == null || awayTeam == null) {

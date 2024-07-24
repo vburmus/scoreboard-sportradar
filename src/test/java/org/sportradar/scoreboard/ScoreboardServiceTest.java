@@ -7,7 +7,8 @@ import org.sportradar.exceptions.MatchNotFoundException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ScoreboardServiceTest {
     public static final String TEAM_A = "Team A";
@@ -25,7 +26,7 @@ class ScoreboardServiceTest {
         //when
         service.startMatch(TEAM_A, TEAM_B);
         //then
-        assertEquals(1, service.getActiveMatches().size());
+        assertEquals(1, service.getSummary().size());
     }
 
     @Test
@@ -64,7 +65,7 @@ class ScoreboardServiceTest {
         var expectedMatch = new Match(TEAM_A, TEAM_B);
         expectedMatch.setHomeScore(1);
         expectedMatch.setAwayScore(2);
-        assertEquals(expectedMatch, service.getActiveMatches().toArray()[0]);
+        assertEquals(expectedMatch.toString(), service.getSummary().getFirst());
     }
 
     @Test
@@ -86,12 +87,12 @@ class ScoreboardServiceTest {
     void finishMatch_matchExists_success() {
         //given
         service.startMatch(TEAM_A, TEAM_B);
-        int sizeBeforeFinish = service.getActiveMatches().size();
+        int sizeBeforeFinish = service.getSummary().size();
         //when
         service.finishMatch(TEAM_A, TEAM_B);
         //then
         assertEquals(1, sizeBeforeFinish);
-        assertEquals(0, service.getActiveMatches().size());
+        assertEquals(0, service.getSummary().size());
     }
 
     @Test
@@ -101,22 +102,27 @@ class ScoreboardServiceTest {
 
     @Test
     void getSummary_sortedByScoreAndStartTime() {
+        //given
         service.startMatch("Mexico", "Canada");
         service.startMatch("Spain", "Brazil");
         service.startMatch("Germany", "France");
         service.startMatch("Uruguay", "Italy");
         service.startMatch("Argentina", "Australia");
-
-        service.updateScore("Mexico", "Canada",0,5);
-        service.updateScore("Spain", "Brazil",10,2);
-        service.updateScore("Germany", "France",2,2);
-        service.updateScore("Uruguay", "Italy",6,6);
-        service.updateScore("Argentina", "Australia",3,1);
+        //when
+        service.updateScore("Mexico", "Canada", 0, 5);
+        service.updateScore("Spain", "Brazil", 10, 2);
+        service.updateScore("Germany", "France", 2, 2);
+        service.updateScore("Uruguay", "Italy", 6, 6);
+        service.updateScore("Argentina", "Australia", 3, 1);
+        //then
         List<String> summary = service.getSummary();
-        assertEquals("Uruguay 6 - Italy 6", summary.get(0));
-        assertEquals("Spain 10 - Brazil 2", summary.get(1));
-        assertEquals("Mexico 0 - Canada 5", summary.get(2));
-        assertEquals("Argentina 3 - Australia 1", summary.get(3));
-        assertEquals("Germany 2 - France 2", summary.get(4));
+        List<String> expectedSummary = List.of(
+                "Uruguay 6 - Italy 6",
+                "Spain 10 - Brazil 2",
+                "Mexico 0 - Canada 5",
+                "Argentina 3 - Australia 1",
+                "Germany 2 - France 2"
+        );
+        assertEquals(expectedSummary, summary);
     }
 }

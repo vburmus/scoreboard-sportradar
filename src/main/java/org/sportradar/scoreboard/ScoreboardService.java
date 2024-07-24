@@ -1,18 +1,20 @@
 package org.sportradar.scoreboard;
 
-import lombok.Getter;
 import org.sportradar.exceptions.MatchConflictException;
 import org.sportradar.exceptions.MatchNotFoundException;
 import org.sportradar.utils.ScoreboardUtils;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-@Getter
 public class ScoreboardService {
     private final Set<Match> activeMatches = new HashSet<>();
 
     public void startMatch(String homeTeam, String awayTeam) {
         ScoreboardUtils.validateTeamNames(homeTeam, awayTeam);
+        // Trim the team names to remove leading and trailing whitespaces
         homeTeam = homeTeam.trim();
         awayTeam = awayTeam.trim();
         ensureMatchDoesNotExist(homeTeam, awayTeam);
@@ -34,13 +36,11 @@ public class ScoreboardService {
     }
 
     public List<String> getSummary() {
-        var sortedMatches = activeMatches.stream()
+        // Sort the matches by total score and start time in descending order and return the list of match summaries
+        return activeMatches.stream()
                 .sorted(Comparator.comparingInt(Match::getTotalScore)
                         .thenComparingLong(Match::getStartTime)
-                        .reversed()
-                )
-                .toList();
-        return sortedMatches.stream()
+                        .reversed())
                 .map(Match::toString)
                 .toList();
     }
